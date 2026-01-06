@@ -38,6 +38,8 @@ a b c d e f g h i j k l
 ```
 More infos: http://www.cvlibs.net/datasets/kitti/eval_odometry.php
 
+![kiiti_and_tum_coordinate info](https://github.com/ashley17happy17/slam/blob/3438fc6d5f6d6bb567ad33c52bc5d5f7430c0c5b/img/kitti_and_tum_format_info.png)
+
 
 ## RUN
 ```
