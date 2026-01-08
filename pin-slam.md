@@ -39,7 +39,7 @@ PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system incl
 Build the docker container:
 The dockerfile is simplified to the most stable status, only install "system low-level" to build the container and setting environment variables. Installation includes CUDA image, system dependencies, PIN-SLAM. 
 
-Due to Pytorch keeps conflicting with the RTX5080 blackwell, PyTorch will be installed after the container is built.
+Due to PyTorch keeps conflicting with the RTX5080 blackwell, PyTorch will be installed after the container is built.
 ```
 cd docker
 sudo chmod +x ./build_docker.sh
@@ -186,9 +186,9 @@ Process all pointclouds in the given <data-dir> (*.ply, *.pcd, *.bin, etc.) usin
 python3 pin_slam.py -i </path/to/your/point/cloud/folder> -vsm
 ```
 
-Process all pointclouds in the given <data-dir> (*.ply, *.pcd, *.bin, etc.) using default config file.
+Process all pointclouds in the given <data-dir> using specific config file (e.g. run_kitti.yaml).
 ```
-python3 pin_slam.py <path-to-config-file.yaml> -i <data-dir> -vsm  
+python3 pin_slam.py <path-to-config-file.yaml> -vsm  
 ```
 
 Process a given ROS1/ROS2 rosbag file (directory, ".bag")
