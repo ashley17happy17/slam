@@ -1,8 +1,37 @@
 # PIN-SLAM
 
 ## Introduction
+PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system including odometry, loop closure detection, and globally consistent mapping.
 
-## Platform Settings
+<!-- TABLE OF CONTENTS -->
+<details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#platform">Platform</a>
+    </li>
+    <li>
+      <a href="#docker-installation">Docker Installation</a>
+    </li>
+    <li>
+      <a href="#run">RUN</a>
+    </li>
+    <li>
+      <a href="#io">I/O</a>
+    </li>
+    <li>
+      <a href="#pros">Pros</a>
+    </li>
+    <li>
+      <a href="#cons">Cons</a>
+    </li>
+    <li>
+      <a href="#reference">Reference</a>
+    </li>
+  </ol>
+</details>
+
+## Platform
 - GPU: NVIDIA GeForce RTX 5080
 
 ## Docker Installation
@@ -19,7 +48,7 @@ sudo chmod +x ./build_docker.sh
 
 Note: If you need to view the progress error while building the container, please modifiy the "./docker/build_docker.sh"
 <details>
-  <summary>[click to open)]</summary>
+  <summary>(click to open)</summary>
 
 ```
 #!/bin/bash
@@ -31,7 +60,7 @@ echo "docker successfully build!"
 
 Note: If you need the "simplified.Dockerfile", it is shown as follows: 
 <details>
-  <summary>[(click to open)]</summary>
+  <summary>(click to open)</summary>
   
 ```
 # 使用支援 sm_120 的最新 CUDA 12.6 鏡像
@@ -75,7 +104,7 @@ sudo chmod +x ./start_docker.sh
 
 Note: If you need the modified "start_docker.sh", it is shown as follows: 
 <details>
-  <summary>[(click to open)]</summary>
+  <summary>(click to open)</summary>
   
 ```
 #!/bin/bash
@@ -109,7 +138,7 @@ docker run -it --rm \
 ### 2. Install PyTorch
 After finishing building the container, it will jump up the container command window. 
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
-  <summary>Please follow the following steps to install PyTorch.</summary>
+  <summary>Please insert the following steps in container cmd to install PyTorch.</summary>
   
 ```
 # 1. 更新 pip
@@ -146,39 +175,56 @@ cd /src/PIN-SLAM
 python3 pin_slam.py ./config/lidar_slam/run_demo.yaml -vsm
 ```
 
+### Test with Self-prepared Data
+Follow the instructions on how to run PIN-SLAM by typing:
+```
+python3 pin_slam.py -h
+```
+
+Process all pointclouds in the given <data-dir> (*.ply, *.pcd, *.bin, etc.) using default config file.
+```
+python3 pin_slam.py -i </path/to/your/point/cloud/folder> -vsm
+```
+
+Process all pointclouds in the given <data-dir> (*.ply, *.pcd, *.bin, etc.) using default config file.
+```
+python3 pin_slam.py <path-to-config-file.yaml> -i <data-dir> -vsm  
+```
+
+Process a given ROS1/ROS2 rosbag file (directory, ".bag")
+```
+python3 pin_slam.py <path-to-config-file.yaml> rosbag -i <path-to-my-rosbag> -dvsm
+```
+
 ## I/O
 ### 1. Input Data
-
+The only data need to prepare is point cloud file (*.ply, *.pcd, *.bin, etc.).
 
 ### 2. Output Data
-- **'TUM' trajectory files**
+- /meta/config_all.yaml (detail config info)
+- /map/neural_points.ply ('.ply' format point cloud map)
+- /mesh/mesh_18cm.ply (object segmented point cloud map)
+- /model/pin_map.pth (.pth is PyTorch state dictionary, which is a Python dictionary that contains the state of a PyTorch model, including the model's weights, biases, and other parameters.)
+- /log/
+- run.sh (shell script to rum the code)
+- odom_poses_tum.txt ('TUM' trajectory files)
+- odom_poses_kitti.txt ('KITTI' pose files)
+- odom_poses.ply (trajectory point)
+- run_demo_sem.yaml (basic config settings, including file path)
+- memory_footprint.npy (numpy binary file?)
+- time_table.npy (numpy binary file that records timestamps)
+- time_details.png (time consuming at each part) 
 
-
-```
-
-```
-More infos: 
-
-  
-- **'KITTI' pose files**
-
-
-
-```
-
-```
-More infos: 
+Note: Coordinate about TUM.txt and KITTI.txt, please refer to the figure below. 
 
 ![kiiti_and_tum_coordinate info](https://github.com/ashley17happy17/slam/blob/3438fc6d5f6d6bb567ad33c52bc5d5f7430c0c5b/img/kitti_and_tum_format_info.png)
 
 
-
-
 ## Pros
-1. 
+1. MIT License. (commercial application enabled)
 
 ## Cons
-1. 
+1. Can't directly run with self-prepared data, it will fail to SLAM.
 
 ## Reference
 1. PIN-SLAM https://github.com/PRBonn/PIN_SLAM.git
