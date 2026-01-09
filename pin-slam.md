@@ -119,7 +119,7 @@ xhost +local:docker
 # 記得把下面這行改成你電腦裡真正的路徑
 DATA_PATH="/home/your_username/data" 
 
-docker run -it --rm \
+docker run -it \
   --name pin_slam_instance \
   --gpus all \
   --privileged \
@@ -129,12 +129,12 @@ docker run -it --rm \
   --env="QT_X11_NO_MITSHM=1" \
   --env="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus" \
   --env="CUDA_MODULE_LOADING=LAZY" \
-  --env="TORCH_CUDA_ARCH_LIST=12.0" \
+  --env="TORCH_CUDA_ARCH_LIST=12.0+PTX" \
   -v /run/user/$(id -u)/bus:/run/user/$(id -u)/bus \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   -v "$DATA_PATH":/storage \
   pinslam:localbuild \
-  /bin/bash -c "export CUDA_MODULE_LOADING=LAZY; export TORCH_CUDA_ARCH_LIST=10.0; xfce4-terminal --title=PIN-SLAM"
+  /bin/bash -c "export CUDA_MODULE_LOADING=LAZY; export TORCH_CUDA_ARCH_LIST=12.0+PTX; xfce4-terminal --title=PIN-SLAM"
 ```
 </details>
 
@@ -167,6 +167,63 @@ python3 -c "import torch; print(f'Testing GPU: {torch.cuda.get_device_name(0)}')
 # Testing GPU: NVIDIA GeForce RTX 5080
 # Result: tensor([2.], device='cuda:0')
 ```
+</details>
+
+### 3. Save Fine-installed Image (Optional)
+Back to your host CMD, try to search the docker which is named "pinslam:localbuild" and in "Exited" status. Save it as the new image that is fine-installed.
+```
+docker ps -a
+docker commit <你的容器ID> pinslam_rtx5080_fixed
+```
+
+As you move to our environment, please modify the "start_docker.sh" first, it is shown as follows: 
+
+<details>
+  <summary>(click to open)</summary>
+  
+```
+# 賦予 Docker 存取顯示器的權限
+xhost +local:docker
+
+# 填入你實際存放 KITTI 或其他數據的本機路徑
+# 記得把下面這行改成你電腦裡真正的路徑
+DATA_PATH="/home/your_username/data" 
+
+docker run -it \
+  --name pin_slam_rtx5080_fixed_instance \
+  --gpus all \
+  --privileged \
+  --network host \
+  --ipc host \
+  --env="DISPLAY=$DISPLAY" \
+  --env="QT_X11_NO_MITSHM=1" \
+  --env="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus" \
+  --env="CUDA_MODULE_LOADING=LAZY" \
+  --env="TORCH_CUDA_ARCH_LIST=12.0+PTX" \
+  -v /run/user/$(id -u)/bus:/run/user/$(id -u)/bus \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v "$DATA_PATH":/storage \
+  pinslam_rtx5080_fixed \
+  /bin/bash
+```
+</details>
+
+As the new image is save, please enter the host CMD with shell script to open the new container. No need to run "start_docker.sh" as it tries to build new container.
+```
+cd ./docker
+bash run_docker.sh
+```
+
+Note: If you need the "run_docker.sh", it is shown as follows: 
+<details>
+  <summary>(click to open)</summary>
+
+```
+docker start pin_slam_rtx5080_fixed_instance
+# 進入容器
+docker exec -it pin_slam_rtx5080_fixed_instance /bin/bash
+```
+
 </details>
 
 ## RUN
