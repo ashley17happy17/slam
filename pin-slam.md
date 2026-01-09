@@ -20,6 +20,9 @@ PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system incl
       <a href="#io">I/O</a>
     </li>
     <li>
+      <a href="nvidia_container_toolkit_failure">NVIDIA Container Toolkit Failure</a>
+    </li>
+    <li>
       <a href="#pros">Pros</a>
     </li>
     <li>
@@ -219,6 +222,41 @@ Note: Coordinate about TUM.txt and KITTI.txt, please refer to the figure below.
 
 ![kiiti_and_tum_coordinate info](https://github.com/ashley17happy17/slam/blob/3438fc6d5f6d6bb567ad33c52bc5d5f7430c0c5b/img/kitti_and_tum_format_info.png)
 
+
+## NVIDIA Container Toolkit Failure
+Due to the container fails to recognize the GPU hardware. Please try to open CMD and insert following commands:
+```
+# 1. 加入 NVIDIA 套件來源
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/stderr > /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# 2. 安裝工具
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+```
+
+Tell docker how to use Nvidia Runtime.
+```
+# 1. 自動設定 Docker 設定檔
+sudo nvidia-ctk runtime configure --runtime=docker
+
+# 2. 重啟 Docker 服務
+sudo systemctl restart docker
+```
+
+Try simple test to make sure docker is able to attach to the GPU.
+```
+docker run --rm --gpus all nvidia/cuda:12.6.0-base-ubuntu22.04 nvidia-smi
+```
+
+If success, you will see the information about GPU. Otherwise, it will return error to inform you that there's still trouble between host driver and docker connection.
+
+Later on, please activate the docker nvironment.
+```
+./start_docker.sh
+```
 
 ## Pros
 1. MIT License. (commercial application enabled)
