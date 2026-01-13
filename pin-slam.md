@@ -258,7 +258,7 @@ python3 pin_slam.py <path-to-config-file.yaml> rosbag -i <path-to-my-rosbag> -dv
 
 ## I/O
 ### 1. Input Data
-The only data need to prepare is point cloud file (*.ply, *.pcd, *.bin, etc.).
+The only data need to prepare is 10 Hz point cloud file (*.ply, *.pcd, *.bin, etc.).
 
 ### 2. Output Data
 - /meta/config_all.yaml (detail config info)
@@ -316,10 +316,13 @@ Later on, please activate the docker nvironment.
 ```
 
 ## Pros
-1. MIT License. (commercial application enabled)
+1. MIT License (commercial application enabled).
+2. Prcoess SLAM fast.
 
 ## Cons
-1. Can't directly run with self-prepared data, it will fail to SLAM.
+1. Fail to SLAM in freeway tunnel.
+2. Need to fine tune several parameters.
+3. Output point cloud map no intensity info.
 
 ## Reference
 1. PIN-SLAM https://github.com/PRBonn/PIN_SLAM.git
