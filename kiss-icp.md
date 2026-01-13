@@ -42,6 +42,14 @@ More infos: http://www.cvlibs.net/datasets/kitti/eval_odometry.php
 
 
 ## RUN
+If the code runs in virtual environment, please source the following shell script first. (optional)
+```
+#!/bin/bash
+source .venv/bin/activate
+echo "KISS-ICP Activated！"
+```
+
+After the virtual environment is activated, please enter following command.
 ```
 kiss_icp_pipeline --visualize [path_to_your_lidar_data_folder]
 ```
@@ -52,6 +60,7 @@ kiss_icp_pipeline --visualize [path_to_your_lidar_data_folder]
 
 ## Cons
 1. LiDAR Odometry will fail in freeway scenario.
+2. No point cloud map output.
 
 ## Reference
 1. KISS-ICP: https://github.com/PRBonn/kiss-icp.git
