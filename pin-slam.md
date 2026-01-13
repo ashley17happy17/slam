@@ -172,11 +172,33 @@ python3 -c "import torch; print(f'Testing GPU: {torch.cuda.get_device_name(0)}')
 ### 3. Save Fine-installed Image (Optional)
 Back to your host CMD, try to search the docker which is named "pinslam:localbuild" and in "Exited" status. Save it as the new image that is fine-installed.
 ```
+# 設定環境變數
+echo 'export TORCH_CUDA_ARCH_LIST="12.0+PTX"' >> ~/.bashrc
+echo 'export CUDA_MODULE_LOADING=LAZY' >> ~/.bashrc
+# 確認目前docker list有哪些物件
 docker ps -a
+# 找到目標容器並輸出成新的映像檔
 docker commit <你的容器ID> pinslam_rtx5080_fixed
 ```
 
-As you move to our environment, please modify the "start_docker.sh" first, it is shown as follows: 
+If you gonna to move to new pc to start the repository, then save the image to a .tar compressed file. Then you can move this .tar file to another pc.
+
+```
+# 格式：docker save -o [存檔路徑] [映像檔名稱]
+docker save -o pinslam_transfer.tar pinslam_rtx5080_fixed
+```
+
+As you move to new environment, please make sure the pc is installed with docker and nvidia toolkit.
+```
+docker load -i pinslam_transfer.tar
+```
+
+And check it loads successfully, insert the following command, then you'll see "pinslam_rtx5080_fixed" in the list.
+```
+docker images
+```
+
+Please modify the "start_docker.sh" first, it is shown as follows. And then you can run the "start_docker.sh" to build new container. 
 
 <details>
   <summary>(click to open)</summary>
@@ -204,11 +226,11 @@ docker run -it \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   -v "$DATA_PATH":/storage \
   pinslam_rtx5080_fixed \
-  /bin/bash
+  /bin/bash -c "export CUDA_MODULE_LOADING=LAZY; export TORCH_CUDA_ARCH_LIST=12.0+PTX"
 ```
 </details>
 
-As the new image is save, please enter the host CMD with shell script to open the new container. No need to run "start_docker.sh" as it tries to build new container.
+As the new image is save, please enter the host CMD with shell script to open the new container. No need to run "start_docker.sh" after the container is built.
 ```
 cd ./docker
 bash run_docker.sh
