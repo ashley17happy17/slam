@@ -1,7 +1,7 @@
 # PIN-SLAM
 
 ## Introduction
-PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system including odometry, loop closure detection, and globally consistent mapping.
+PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system including odometry, loop closure detection, and globally consistent mapping. 
 
 <!-- TABLE OF CONTENTS -->
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
@@ -18,6 +18,9 @@ PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system incl
     </li>
     <li>
       <a href="#io">I/O</a>
+    </li>
+    <li>
+      <a href="#config">Config</a>
     </li>
     <li>
       <a href="nvidia_container_toolkit_failure">NVIDIA Container Toolkit Failure</a>
@@ -300,13 +303,17 @@ Tr: 4.276802385584e-04 -9.999672484946e-01 -8.084491683471e-03 -1.198459927713e-
 - /model/pin_map.pth (.pth is PyTorch state dictionary, which is a Python dictionary that contains the state of a PyTorch model, including the model's weights, biases, and other parameters.)
 - /log/
 - run.sh (shell script to rum the code)
-- odom_poses_tum.txt ('TUM' trajectory files)
-- odom_poses_kitti.txt ('KITTI' pose files)
+- odom_poses_tum.txt ('TUM' LO pose files)
+- odom_poses_kitti.txt ('KITTI' LO pose files)
 - odom_poses.ply (trajectory point)
+- slam_poses_tum.txt ('TUM' SLAM pose files)
+- slam_poses_kitti.txt ('KITTI' SLAM pose files)
 - run_demo_sem.yaml (basic config settings, including file path)
 - memory_footprint.npy (numpy binary file?)
 - time_table.npy (numpy binary file that records timestamps)
-- time_details.png (time consuming at each part) 
+- time_details.png (time consuming at each part)
+- loop_log.txt (record start, end frame no., and the RT matrix)
+- loop_plot.png (record the loop closure correction)
 
 Note: Coordinate about TUM.txt and KITTI.txt, please refer to the figure below. 
 
