@@ -1,0 +1,250 @@
+# LIO-SAM
+
+## Introduction
+A real-time lidar-inertial odometry package. 
+
+<!-- TABLE OF CONTENTS -->
+<details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#install">Install</a>
+    </li>
+    <li>
+      <a href="#docker">Docker</a>
+    </li>
+    <li>
+      <a href="#run">Run</a>
+    </li>
+    <li>
+      <a href="#i/o">I/O</a>
+    </li>
+    <li>
+      <a href="#config">Config</a>
+    </li>
+    <li>
+      <a href="#build">Build</a>
+    </li>
+    <li>
+      <a href="#rosbag_version_conversion">Rosbag Version Conversion</a>
+    </li>
+    <li>
+      <a href="#reference">Reference</a>
+    </li>
+  </ol>
+</details>
+
+## Install
+**ROS1 version**
+```
+cd ~/catkin_ws/src
+git clone https://github.com/TixiaoShan/LIO-SAM.git
+cd ..
+catkin_make
+```
+
+**ROS2 version**
+```
+cd ~/ros2_ws/src
+git clone https://github.com/TixiaoShan/LIO-SAM.git
+cd LIO-SAM
+git checkout ros2
+cd ..
+colcon build
+```
+
+## Docker
+**ROS1 version**
+1. Build docker image.
+```
+docker build -t liosam-kinetic-xenial .
+```
+2. Start the container.
+```
+docker run --init -it -d \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v /<your_pc_data_path>:/root/catkin_ws/src/LIO-SAM/data\
+  -e DISPLAY=$DISPLAY \
+  liosam-kinetic-xenial \
+  bash
+```
+
+**ROS2 version**
+1. Build docker image.
+```
+docker build -t liosam-humble-jammy .
+```
+2. Start the container.
+```
+docker run --init -it -d \
+  --name liosam-humble-jammy-container \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v /<your_pc_data_path>:/root/catkin_ws/src/LIO-SAM/data\
+  -e DISPLAY=$DISPLAY \
+  --runtime=nvidia --gpus all \
+  liosam-humble-jammy \
+  bash
+```
+
+## Run
+**ROS1**
+1. Run the launch file.
+```
+roslaunch lio_sam run.launch
+```
+2. Play existing bag files.
+```
+rosbag play <your_bag.bag> -r 3
+```
+
+**ROS2**
+1. Run the launch file.
+```
+ros2 launch lio_sam run.launch.py
+```
+2. Play existing bag files.
+```
+ros2 bag play <your_bag_folder>
+```
+
+## I/O
+1.Input
+
+2.Output
+
+## Config
+Make sure the the topic name (ex: "pointCloudTopic", "imuTopic"), frames (ex: "lidarFrame"), sensor settings, and EOP are corresponded with the bag file metadata.yaml.
+<details> 
+  <summary>(click to open)</summary>
+  
+```
+/**:
+  ros__parameters:
+
+    # Topics
+    pointCloudTopic: "/points_raw"                   # Point cloud data
+    imuTopic: "/imu_raw"                        # IMU data
+    odomTopic: "odometry/imu"                    # IMU pre-preintegration odometry, same frequency as IMU
+    gpsTopic: "odometry/gpsz"                    # GPS odometry topic from navsat, see module_navsat.launch file
+
+    # Frames
+    lidarFrame: "velodyne"
+    baselinkFrame: "base_link"
+    odometryFrame: "odom"
+    mapFrame: "map"
+
+    # GPS Settings
+    useImuHeadingInitialization: false           # if using GPS data, set to "true"
+    useGpsElevation: false                       # if GPS elevation is bad, set to "false"
+    gpsCovThreshold: 2.0                         # m^2, threshold for using GPS data
+    poseCovThreshold: 25.0                       # m^2, threshold for using GPS data
+
+    # Export settings
+    savePCD: true                               # https://github.com/TixiaoShan/LIO-SAM/issues/3
+    savePCDDirectory: "/Downloads/LOAM/"         # in your home folder, starts and ends with "/". Warning: the code deletes "LOAM" folder then recreates it. See "mapOptimization" for implementation
+
+    # Sensor Settings
+    sensor: velodyne                               # lidar sensor type, either 'velodyne', 'ouster' or 'livox'
+    N_SCAN: 16                                   # number of lidar channels (i.e., Velodyne/Ouster: 16, 32, 64, 128, Livox Horizon: 6)
+    Horizon_SCAN: 1800                            # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048, Livox Horizon: 4000)
+    downsampleRate: 1                            # default: 1. Downsample your data if too many
+    # points. i.e., 16 = 64 / 4, 16 = 16 / 1
+    lidarMinRange: 1.0                           # default: 1.0, minimum lidar range to be used
+    lidarMaxRange: 1000.0                        # default: 1000.0, maximum lidar range to be used
+
+    # IMU Settings
+    imuAccNoise: 3.9939570888238808e-03
+    imuGyrNoise: 1.5636343949698187e-03
+    imuAccBiasN: 6.4356659353532566e-05
+    imuGyrBiasN: 3.5640318696367613e-05
+
+    imuGravity: 9.80511
+    imuRPYWeight: 0.01
+
+    extrinsicTrans:  [0.0, 0.0, 0.0]
+    extrinsicRot:    [1.0,  0.0,  0.0,
+                      0.0, -1.0,  0.0,
+                      0.0,  0.0, -1.0]
+    extrinsicRPY:    [1.0,  0.0,  0.0,
+                      0.0, -1.0,  0.0,
+                      0.0,  0.0, -1.0]
+
+    # LOAM feature threshold
+    edgeThreshold: 1.0
+    surfThreshold: 0.1
+    edgeFeatureMinValidNum: 10
+    surfFeatureMinValidNum: 100
+
+    # voxel filter paprams
+    odometrySurfLeafSize: 0.4                     # default: 0.4 - outdoor, 0.2 - indoor
+    mappingCornerLeafSize: 0.2                    # default: 0.2 - outdoor, 0.1 - indoor
+    mappingSurfLeafSize: 0.4                      # default: 0.4 - outdoor, 0.2 - indoor
+
+    # robot motion constraint (in case you are using a 2D robot)
+    z_tollerance: 1000.0                          # meters
+    rotation_tollerance: 1000.0                   # radians
+
+    # CPU Params
+    numberOfCores: 4                              # number of cores for mapping optimization
+    mappingProcessInterval: 0.15                  # seconds, regulate mapping frequency
+
+    # Surrounding map
+    surroundingkeyframeAddingDistThreshold: 1.0   # meters, regulate keyframe adding threshold
+    surroundingkeyframeAddingAngleThreshold: 0.2  # radians, regulate keyframe adding threshold
+    surroundingKeyframeDensity: 2.0               # meters, downsample surrounding keyframe poses   
+    surroundingKeyframeSearchRadius: 50.0         # meters, within n meters scan-to-map optimization
+    # (when loop closure disabled)
+
+    # Loop closure
+    loopClosureEnableFlag: true
+    loopClosureFrequency: 1.0                     # Hz, regulate loop closure constraint add frequency
+    surroundingKeyframeSize: 50                   # submap size (when loop closure enabled)
+    historyKeyframeSearchRadius: 15.0             # meters, key frame that is within n meters from
+    # current pose will be considerd for loop closure
+    historyKeyframeSearchTimeDiff: 30.0           # seconds, key frame that is n seconds older will be
+    # considered for loop closure
+    historyKeyframeSearchNum: 25                  # number of hostory key frames will be fused into a
+    # submap for loop closure
+    historyKeyframeFitnessScore: 0.3              # icp threshold, the smaller the better alignment
+
+    # Visualization
+    globalMapVisualizationSearchRadius: 1000.0    # meters, global map visualization radius
+    globalMapVisualizationPoseDensity: 10.0       # meters, global map visualization keyframe density
+    globalMapVisualizationLeafSize: 1.0           # meters, global map visualization cloud density
+```
+
+</details>
+
+## Build
+If modified any code in src, please build the project first.
+
+```
+cd ~/ros2_ws
+rm -rf build/ install/ log/
+colcon build --packages-select lio_sam
+```
+
+## Rosbag Version Conversion
+For rosbag1 to rosbag2, please enter the environment of ros1 and insert the following command.
+```
+pip3 install rosbags>=0.9.11
+rosbags-convert --src <ros1.bag> --dst <ros2_bag_folder>
+```
+
+After conversion, open the metadata.yaml in the bag folder, delete the description of all
+```
+type_description_hash: xxxxxxxxx
+```
+And modified the following statement
+```
+# original version: offered_qos_profiles: []
+offered_qos_profiles: ""    # modified version
+```
+
+## Reference
+1. LIO-SAM: https://github.com/TixiaoShan/LIO-SAM/tree/ros2?tab=readme-ov-file#run-the-package
+2. Rosbag version conversion: https://docs.ros.org/en/noetic/api/ov_core/html/dev-ros1-to-ros2.html
