@@ -26,6 +26,9 @@ A real-time lidar-inertial odometry package.
       <a href="#build">Build</a>
     </li>
     <li>
+      <a href="#save_result">Save Result</a>
+    </li>
+    <li>
       <a href="#rosbag_version_conversion">Rosbag Version Conversion</a>
     </li>
     <li>
@@ -83,7 +86,7 @@ docker run --init -it -d \
   -v /etc/localtime:/etc/localtime:ro \
   -v /etc/timezone:/etc/timezone:ro \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v /<your_pc_data_path>:/root/catkin_ws/src/LIO-SAM/data\
+  -v /<your_pc_data_path>:/root/ros2_ws/src/LIO-SAM/data\
   -e DISPLAY=$DISPLAY \
   --runtime=nvidia --gpus all \
   liosam-humble-jammy \
@@ -106,15 +109,22 @@ rosbag play <your_bag.bag> -r 3
 ```
 ros2 launch lio_sam run.launch.py
 ```
-2. Play existing bag files.
+2. Play existing bag files. Add "--clock" to run the code with bag file recorded time, otherwise it will use wall time (unixtime now).
 ```
-ros2 bag play <your_bag_folder>
+ros2 bag play <your_bag_folder> --clock
 ```
+Note: If you want to speed up or down the rosbag play, then add "-r <speed>" after the "ros2 bag play".
 
 ## I/O
 1.Input
+- Bag file corresponding to ROS1 or ROS2. IMU and LiDAR are must, while GNSS and Odometer are optional.
 
 2.Output
+- CornerMap.pcd
+- GlobalMap.pcd
+- SurfMap.pcd
+- trajectory.pcd
+- transformations.pcd
 
 ## Config
 Make sure the the topic name (ex: "pointCloudTopic", "imuTopic"), frames (ex: "lidarFrame"), sensor settings, and EOP are corresponded with the bag file metadata.yaml.
@@ -221,17 +231,29 @@ Make sure the the topic name (ex: "pointCloudTopic", "imuTopic"), frames (ex: "l
 
 ## Build
 If modified any code in src, please build the project first.
-
 ```
 cd ~/ros2_ws
 rm -rf build/ install/ log/
 colcon build --packages-select lio_sam
 ```
 
+## Save Result
+**ROS1 version**
+```
+# for example: rosservice call <service> <resolution> <destination>
+rosservice call /lio_sam/save_map 0.2 "/Downloads/LOAM/"
+```
+
+**ROS2 version**
+For now, only resolution and destination variables can be set.
+```
+ros2 service call /lio_sam/save_map lio_sam/srv/SaveMap "{resolution: 0.2, destination: /Downloads/service_LOAM}" 
+```
+
 ## Rosbag Version Conversion
 For rosbag1 to rosbag2, please enter the environment of ros1 and insert the following command.
 ```
-pip3 install rosbags>=0.9.11
+pip3 install rosbags>=0.9.11  # for first time only
 rosbags-convert --src <ros1.bag> --dst <ros2_bag_folder>
 ```
 
