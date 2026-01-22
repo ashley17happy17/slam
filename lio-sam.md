@@ -119,6 +119,13 @@ Note: If you want to speed up or down the rosbag play, then add "-r <speed>" aft
 1.Input
 - Bag file corresponding to ROS1 or ROS2. IMU and LiDAR are must, while GNSS and Odometer are optional.
 
+Note: To check the content within each sensor, try the following command:
+```
+# ros2 topic list -v   # show all the topic name ongoing
+# ros2 topic echo <topic_name> 
+ros2 topic echo /points_raw    # add --once to show just one frame of data
+```
+
 2.Output
 - CornerMap.pcd
 - GlobalMap.pcd
@@ -226,8 +233,13 @@ Make sure the the topic name (ex: "pointCloudTopic", "imuTopic"), frames (ex: "l
     globalMapVisualizationPoseDensity: 10.0       # meters, global map visualization keyframe density
     globalMapVisualizationLeafSize: 1.0           # meters, global map visualization cloud density
 ```
-
 </details>
+
+If you want to check what's the value of each parameters are, try the following command during the rosbag play:
+```
+# ros2 param get <node> <parameter>
+ros2 param get /lio_sam_imageProjection extrinsicRot
+```
 
 ## Build
 If modified any code in src, please build the project first.
@@ -245,9 +257,11 @@ rosservice call /lio_sam/save_map 0.2 "/Downloads/LOAM/"
 ```
 
 **ROS2 version**
+
 For now, only resolution and destination variables can be set.
 ```
-ros2 service call /lio_sam/save_map lio_sam/srv/SaveMap "{resolution: 0.2, destination: /Downloads/service_LOAM}" 
+# for example: ros2 service call <service> "{resolution: <resolution>, destination: <destination>}"
+ros2 service call /lio_sam/save_map lio_sam/srv/SaveMap "{resolution: 0.2, destination: /ros2_ws/src/LIO-SAM/output/garden}" 
 ```
 
 ## Rosbag Version Conversion
@@ -261,11 +275,12 @@ After conversion, open the metadata.yaml in the bag folder, delete the descripti
 ```
 type_description_hash: xxxxxxxxx
 ```
-And modified the following statement
+And modified the part of "offered_qos_profiles". If the "offered_qos_profiles" involves some statements, just delete the statements and replace with "".
 ```
 # original version: offered_qos_profiles: []
 offered_qos_profiles: ""    # modified version
 ```
+Finally, change the version: 4 to version: 9.
 
 ## Reference
 1. LIO-SAM: https://github.com/TixiaoShan/LIO-SAM/tree/ros2?tab=readme-ov-file#run-the-package
