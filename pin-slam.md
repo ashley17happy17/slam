@@ -23,7 +23,7 @@ PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system incl
       <a href="#config">Config</a>
     </li>
     <li>
-      <a href="nvidia_container_toolkit_failure">NVIDIA Container Toolkit Failure</a>
+      <a href="#nvidia_container_toolkit_failure">NVIDIA Container Toolkit Failure</a>
     </li>
     <li>
       <a href="#pros">Pros</a>
