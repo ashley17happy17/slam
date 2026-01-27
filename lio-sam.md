@@ -20,6 +20,9 @@ A real-time lidar-inertial odometry package.
       <a href="#i/o">I/O</a>
     </li>
     <li>
+      <a href="#frame_transformation">Frame Transformation</a>
+    </li>
+    <li>
       <a href="#config">Config</a>
     </li>
     <li>
@@ -37,6 +40,8 @@ A real-time lidar-inertial odometry package.
   </ol>
 </details>
 
+
+<a name="install"></a>
 ## Install
 **ROS1 version**
 ```
@@ -56,6 +61,8 @@ cd ..
 colcon build
 ```
 
+
+<a name="docker"></a>
 ## Docker
 **ROS1 version**
 1. Build docker image.
@@ -93,6 +100,8 @@ docker run --init -it -d \
   bash
 ```
 
+
+<a name="run"></a>
 ## Run
 **ROS1**
 1. Run the launch file.
@@ -115,6 +124,8 @@ ros2 bag play <your_bag_folder> --clock
 ```
 Note: If you want to speed up or down the rosbag play, then add "-r <speed>" after the "ros2 bag play".
 
+
+<a name="i/o"></a>
 ## I/O
 1.Input
 - Bag file corresponding to ROS1 or ROS2. IMU and LiDAR are must, while GNSS and Odometer are optional.
@@ -133,6 +144,38 @@ ros2 topic echo /points_raw    # add --once to show just one frame of data
 - trajectory.pcd
 - transformations.pcd
 
+
+<a name="frame_transformation"></a>
+## Frame Transformation
+1. Frames Introduction
+
+| Name | Definition | Source |
+|------|----------|------|
+| map | psudo global map origin (static frame) | lio_sam_mapOptimization |
+| odom | 里程計原點：機器人剛啟動時的位置。它會隨著 Lidar 里程計的累計誤差而與 map 產生偏離。 | lio_sam_imuPreintegration |
+| odom_mapping | SLAM 內部參考點：LIO-SAM 算法內部計算用的虛擬中心。在您的配置中，我們將它視為導航算法的邏輯起點。 | LIO-SAM node |
+| base_link | robot actual body center，通常設定在機器人選轉中心或底盤中心 |  |
+| chassis_link | 底盤實體座標：代表機器人的金屬底盤結構。通常 base_link 與 chassis_link 位置重合，但 chassis_link 更偏向描述物理結構。 | URDF model |
+| lidar_link | origin: center of LiDAR data | 靜態 TF 或 URDF |
+| imu_link | origin: center of IMU | 靜態 TF 或 URDF |
+| navsat_link | origin: GPS antenna | 靜態 TF 或 URDF |
+
+2. Nodes for Frame Transformation
+
+```
+Node(
+    package='tf2_ros',
+    executable='static_transform_publisher',
+    # 請根據你的機器人實際安裝位置調整，若不確定先設全 0+
+    name='tf_odom_mapping_navsat',
+    arguments=['--x', '0', '--y', '0', '--z', '0', '--yaw', '0', '--pitch', '0', '--roll', '0', '--frame-id', 'odom', '--child-frame-id', 'odom_mapping'],
+    parameters=[{'use_sim_time': False}], # use simulation time or not
+    output='screen'
+)
+```
+
+
+<a name="config"></a>
 ## Config
 Make sure the the topic name (ex: "pointCloudTopic", "imuTopic"), frames (ex: "lidarFrame"), sensor settings, and EOP are corresponded with the bag file metadata.yaml.
 <details> 
@@ -241,6 +284,8 @@ If you want to check what's the value of each parameters are, try the following 
 ros2 param get /lio_sam_imageProjection extrinsicRot
 ```
 
+
+<a name="build"></a>
 ## Build
 If modified any code in src, please build the project first.
 ```
@@ -249,6 +294,7 @@ rm -rf build/ install/ log/
 colcon build --packages-select lio_sam
 ```
 
+<a name="save_result"></a>
 ## Save Result
 **ROS1 version**
 ```
@@ -264,6 +310,8 @@ For now, only resolution and destination variables can be set.
 ros2 service call /lio_sam/save_map lio_sam/srv/SaveMap "{resolution: 0.2, destination: /ros2_ws/src/LIO-SAM/output/garden}" 
 ```
 
+
+<a name="rosbag_version_conversion"></a>
 ## Rosbag Version Conversion
 For rosbag1 to rosbag2, please enter the environment of ros1 and insert the following command.
 ```
@@ -282,6 +330,8 @@ offered_qos_profiles: ""    # modified version
 ```
 Finally, change the version: 4 to version: 9.
 
+
+<a name="reference"></a>
 ## Reference
 1. LIO-SAM: https://github.com/TixiaoShan/LIO-SAM/tree/ros2?tab=readme-ov-file#run-the-package
 2. Rosbag version conversion: https://docs.ros.org/en/noetic/api/ov_core/html/dev-ros1-to-ros2.html
