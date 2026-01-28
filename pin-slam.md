@@ -23,7 +23,7 @@ PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system incl
       <a href="#config">Config</a>
     </li>
     <li>
-      <a href="nvidia_container_toolkit_failure">NVIDIA Container Toolkit Failure</a>
+      <a href="#nvidia_container_toolkit_failure">NVIDIA Container Toolkit Failure</a>
     </li>
     <li>
       <a href="#pros">Pros</a>
@@ -37,9 +37,13 @@ PIN-SLAM is a full-fledged implicit neural LiDAR-Odometry-based SLAM system incl
   </ol>
 </details>
 
+
+<a name="platform"></a>
 ## Platform
 - GPU: NVIDIA GeForce RTX 5080
 
+
+<a name="docker-installation"></a>
 ## Docker Installation
 ### 1. Build Container
 Build the docker container:
@@ -248,9 +252,10 @@ docker start pin_slam_rtx5080_fixed_instance
 # 進入容器
 docker exec -it pin_slam_rtx5080_fixed_instance /bin/bash
 ```
-
 </details>
 
+
+<a name="run"></a>
 ## RUN
 ### Sanitary Test
 For a sanity test, do the following to download an example part (first 100 frames) of the KITTI dataset (seq 00):
@@ -281,6 +286,7 @@ Process a given ROS1/ROS2 rosbag file (directory, ".bag")
 python3 pin_slam.py <path-to-config-file.yaml> rosbag -i <path-to-my-rosbag> -dvsm
 ```
 
+<a name="i_o"></a>
 ## I/O
 ### 1. Input Data
  - point cloud file, ex: *.ply, *.pcd, *.bin, etc.
@@ -320,6 +326,7 @@ Note: Coordinate about TUM.txt and KITTI.txt, please refer to the figure below.
 ![kiiti_and_tum_coordinate info](https://github.com/ashley17happy17/slam/blob/3438fc6d5f6d6bb567ad33c52bc5d5f7430c0c5b/img/kitti_and_tum_format_info.png)
 
 
+<a name="config"></a>
 ## Config
 
 The config settings are set in "./utils/config.py". <details> <summary>(click to open)</summary>
@@ -653,6 +660,8 @@ self.timeout_duration_s: int = 30 # in seconds, exit after receiving no topic fo
 ```
 </details>
 
+
+<a name="nvidia_container_toolkit_failure"></a>
 ## NVIDIA Container Toolkit Failure
 Due to the container fails to recognize the GPU hardware. Please try to open CMD and insert following commands:
 ```
@@ -688,14 +697,20 @@ Later on, please activate the docker nvironment.
 ./start_docker.sh
 ```
 
+
+<a name="pros"></a>
 ## Pros
 1. MIT License (commercial application enabled).
 2. Prcoess SLAM fast.
 
+
+<a name="cons"></a>
 ## Cons
 1. Fail to SLAM in freeway tunnel.
 2. Need to fine tune several parameters.
 3. Output point cloud map no intensity info.
 
+
+<a name="reference"></a>
 ## Reference
 1. PIN-SLAM https://github.com/PRBonn/PIN_SLAM.git
