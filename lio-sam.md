@@ -160,19 +160,15 @@ ros2 topic echo /points_raw    # add --once to show just one frame of data
 | imu_link | origin: center of IMU | 靜態 TF 或 URDF |
 | navsat_link | origin: GPS antenna | 靜態 TF 或 URDF |
 
+<p align='center'>
+    <img src="./img/LIO-SAM_structure.drawio.png" alt="LIOSAM_structure.drawio" width="600"/>
+</p>
+
 2. Nodes for Frame Transformation
 
-```
-Node(
-    package='tf2_ros',
-    executable='static_transform_publisher',
-    # 請根據你的機器人實際安裝位置調整，若不確定先設全 0+
-    name='tf_odom_mapping_navsat',
-    arguments=['--x', '0', '--y', '0', '--z', '0', '--yaw', '0', '--pitch', '0', '--roll', '0', '--frame-id', 'odom', '--child-frame-id', 'odom_mapping'],
-    parameters=[{'use_sim_time': False}], # use simulation time or not
-    output='screen'
-)
-```
+<p align='center'>
+    <img src="./img/liosamsystem.png" alt="lio-sam_system" width="600"/>
+</p>
 
 
 <a name="config"></a>
