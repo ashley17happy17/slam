@@ -1,7 +1,14 @@
 # LIO-SAM
 
 ## Introduction
-A real-time lidar-inertial odometry package. 
+A real-time lidar-inertial odometry package. Which conducts the LIO-SAM based on the structure below.
+
+<p align='center'>
+    <img src="./img/lio-sam_step1.drawio.png" alt="lio-sam_step1" width="200"/>
+    <img src="./img/lio-sam_step2.drawio.png" alt="lio-sam_step2" width="200"/>
+    <img src="./img/lio-sam_step3.drawio.png" alt="lio-sam_step3" width="200"/>
+    <img src="./img/lio-sam_step4.drawio.png" alt="lio-sam_step4" width="200"/>
+</p>
 
 <!-- TABLE OF CONTENTS -->
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
@@ -153,7 +160,7 @@ ros2 topic echo /points_raw    # add --once to show just one frame of data
 |------|----------|------|
 | map | psudo global map origin (static frame) | lio_sam_mapOptimization |
 | odom | 里程計原點：機器人剛啟動時的位置。它會隨著 Lidar 里程計的累計誤差而與 map 產生偏離。 | lio_sam_imuPreintegration |
-| odom_mapping | SLAM 內部參考點：LIO-SAM 算法內部計算用的虛擬中心。在您的配置中，我們將它視為導航算法的邏輯起點。 | LIO-SAM node |
+| odom_mapping | SLAM 內部參考點：LIO-SAM 算法內部計算用的虛擬中心。在您的配置中，我們將它視為導航算法的邏輯起點。 | lio_sam_mapOptimization node |
 | base_link | robot actual body center，通常設定在機器人選轉中心或底盤中心 |  |
 | chassis_link | 底盤實體座標：代表機器人的金屬底盤結構。通常 base_link 與 chassis_link 位置重合，但 chassis_link 更偏向描述物理結構。 | URDF model |
 | lidar_link | origin: center of LiDAR data | 靜態 TF 或 URDF |
@@ -161,7 +168,7 @@ ros2 topic echo /points_raw    # add --once to show just one frame of data
 | navsat_link | origin: GPS antenna | 靜態 TF 或 URDF |
 
 <p align='center'>
-    <img src="./img/LIO-SAM_structure.drawio.png" alt="LIOSAM_structure.drawio" width="600"/>
+    <img src="./img/lio-sam_structure.drawio.png" alt="LIOSAM_structure.drawio" width="600"/>
 </p>
 
 2. Nodes for Frame Transformation
